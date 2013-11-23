@@ -62,7 +62,6 @@
         <h3 id="docDeps">Dependencies</h3>
         <ul>
           <li>Iron router, coffeescript and stylus packages are required by the package itself</li>
-          <li>The Notifications package included into the repo</li>
           <li>The package includes Bootstrap 3 into your html</li>
         </ul>
         <h3 id="docInstallation">Installation</h3>
@@ -533,6 +532,14 @@
               <td>Javascript(server)</td>
               <td>Usable inside templates.<br>Server only settings on vector/settings_server.coffee</td>
             </tr>         
+            <tr>
+              <td><code>Vector.notifications</code></td>
+              <td>Javascript(client)</td>
+              <td>A simple notification system.
+              <br>Temporary message: <code>.send()</code>
+              <br>Hold message: <code>.hold()</code>
+              <br>Reset message: <code>.reset()</code></td>
+            </tr>
             <tr>
               <td><code>Router.getData</code></td>
               <td>Javascript</td>
