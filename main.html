@@ -1,0 +1,755 @@
+<head>
+  <title>vector</title>
+  <link rel="stylesheet" type="text/css" href="/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/bootstrap-theme.min.css">
+</head>
+
+<body>
+</body>
+
+<template name="layout">
+ {{yield}}
+</template>
+
+<template name="index">
+  <div class="container" id="site">
+    <div class="row">
+      <div class="col-md-12" id="header">
+        <h1>This is Vector<br>An administration tool<br>for Meteor</h1>
+        <ul id="siteNavMain" class="list-unstyled text-right">
+          <li><a href="#docs">Docs</a></li>
+          <li><a href="#modules">Modules</a></li>
+          <li><a href="#demo">Demo</a></li>
+          <li><a href="#contribute">Contributing</a></li>
+          <li><a href="https://github.com/handmadeadv/vector">Github</a></li>
+        </ul>
+        <hr>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <!-- example of dynamic content with route data -->
+        {{#each pages}}
+          <h2>{{title}}</h2>
+          {{{description}}}
+        {{/each}}
+        <!-- end example -->
+        <h2 id="docs">Documentation</h2>
+        <h3>Index</h3>
+        <h4>Installation</h4>
+        <ul>
+          <li><a href="#docDeps">Dependencies</a></li>
+          <li><a href="#docInstallation">Installation</a></li>
+          <li><a href="#docConfig">Basic configuration</a></li>
+          <li><a href="#docSite">Integrating with your website</a></li>
+        </ul>
+        <h4>Usage</h4>
+        <ul>
+          <li><a href="#docUse">Using the admin panel</a></li>
+          <li><a href="#docRoles">Managing accounts and roles</a></li>
+          <li><a href="#docRel">Relationships between collections</a></li>
+          <li><a href="#docSettings">Settings</a></li>
+          <li><a href="#docRoutes">Routes</a></li>
+          <li><a href="#modules">Modules documentation</a></li>
+        </ul>
+        <h4>Custom modules</h4>
+        <ul>
+          <li><a href="#docCustom">Building custom modules</a></li>
+          <li><a href="#docStandard">Convestions and default settings</a></li>
+          <li><a href="#docForms">Modals API</a></li>
+          <li><a href="#docHooks">Helpers and hooks cheatsheet</a></li>
+        </ul>
+        <h3 id="docDeps">Dependencies</h3>
+        <ul>
+          <li>Iron router, coffeescript and stylus packages are required by the package itself</li>
+          <li>The Notifications package included into the repo</li>
+          <li>The package includes Bootstrap 3 into your html</li>
+        </ul>
+        <h3 id="docInstallation">Installation</h3>
+        <p>This package is not currently available through Meteorite. To use it:
+        <ul>
+          <li>Clone the repository at <code>https://github.com/handmadeadv/vector.git</code></li>
+          <li>Or download the repo as a zip archive at <a href="https://github.com/handmadeadv/vector">https://github.com/handmadeadv/vector</a></li>
+          <li>Enter your project and run <code>mrt --settings settings.json</code>; this will update the dependencies and run the server</li>
+          <li>The default credentials are email:<code>super@user.com</code>, password:<code>super</code></li>
+          <li>Optional: you can check this webiste as a live example of integration at <a href="https://github.com/handmadeadv/vector-website">https://github.com/handmadeadv/vector-website</a></li>
+        </ul>
+        <p><strong><br>Since this entire website is included into the repository, you can use the repo as a living example of integration within a project.</strong></p>
+        <h3 id="docConfig">Basic configuration</h3>
+        <p>Your main configuration file will be <code>settings.json</code> inside the <code>vectorResources</code> object.<br>Here you will setup which collections and which fields will be available to the end user.
+        <br>Meteor settings are loaded on server startup using the option <code>--settings settings.json</code></p>
+        <p>This is an example of an empty resource definition:</p>
+        <pre>
+{
+  "public":{
+    vectorResources:{
+      "pages": {
+        "label": "Pages",
+        "roles": [],
+        "collectionFields": [],
+        "collectionActions": [],
+        "documentFields": [],
+        "documentActions": []
+      }
+    }
+  }
+}
+        </pre>
+        <p>Every property is optional. The below code would be a legal declaration, although the result would be an empty page:</p>
+        <pre>
+{
+  "public":{
+    vectorResources:{
+      "pages": {}
+    }
+  }
+}
+        </pre>
+        <p>The <code>label</code> property will be displayed within the main menu:</p>
+        <pre>
+{
+  "public":{
+    vectorResources:{
+      "pages": {
+        "label": "Pages"
+      }
+    }
+  }
+}
+        </pre>
+        <p>The <code>role</code> property is an array of strings.
+        <br><code>guest</code> will make the collection available (read only) to anyone
+        <br><code>administrator</code> is the default role.</p>
+        <pre>
+{
+  "public":{
+    vectorResources:{
+      "pages": {
+        "label": "Pages"
+        "roles": ["administrator","editor"]
+      }
+    }
+  }
+}
+        </pre>
+        <p>the <code>collectionFields</code> array registers what has to be displayed on the collection area of the page. Usually, a list of documents.<br>
+        <code>type</code> refers to the module exact name.
+        </p>
+        <pre>
+{
+  "public":{
+    vectorResources:{
+      "pages": {
+        "label": "Pages"
+        "roles": ["administrator","editor"]
+        "collectionFields": [
+          {
+            "type": "accountList"
+            "label": "Manage users"
+          }
+        ]
+      }
+    }
+  }
+}
+        </pre>
+        <p><code>collectionActions</code> adds element to the actions list. Usually, collection level operations such create new documents.</p>
+        <pre>
+{
+  "public":{
+    vectorResources:{
+      "pages": {
+        "label": "Pages"
+        "roles": ["administrator","editor"]
+        "collectionFields": [
+          {
+            "type": "accountList"
+            "label": "Manage users"
+          }
+        ],
+        "collectionActions": [
+          {
+            "label": "Create new"
+            "type": "create"
+          }
+        ]
+      }
+    }
+  }
+}
+        </pre>
+        <p><code>documentFields</code> registers the editable fields on the document area. An additional <code>key</code> property is required and refers to the mongo document property name.<br>
+        <pre>
+{
+  "public":{
+    vectorResources:{
+      "pages": {
+        "label": "Pages"
+        "roles": ["administrator","editor"]
+        "collectionFields": [
+          {
+            "type": "accountList"
+            "label": "Manage users"
+          }
+        ],
+        "collectionActions": [
+          {
+            "label": "Create new"
+            "type": "create"
+          }
+        ],
+        "documentFields": [
+          {
+            "key": "title"
+            "label": "Title"
+            "type": "text"
+          }, {
+            "key": "description"
+            "label": "Description"
+            "type": "textarea"
+          }
+        ] 
+      }
+    }
+  }
+}        
+</pre>
+        <p><code>documentActions</code> registers document level actions. Usually duplicate or delete.</p>
+        <pre>
+
+{
+  "public":{
+    vectorResources:{
+      "pages": {
+        "label": "Pages"
+        "roles": ["administrator","editor"]
+        "collectionFields": [
+          {
+            "type": "accountList"
+            "label": "Manage users"
+          }
+        ],
+        "collectionActions": [
+          {
+            "label": "Create new"
+            "type": "create"
+          }
+        ],
+        "documentFields": [
+          {
+            "key": "title"
+            "label": "Title"
+            "type": "text"
+          }, {
+            "key": "description"
+            "label": "Description"
+            "type": "textarea"
+          }
+        ],
+        "documentActions": 
+        [
+          {
+            "type": "delete"
+            "label": "Delete document"
+          }, {
+            "type": "duplicate"
+            "label": "Create a copy"
+          }
+        ]
+      }
+    }
+  }
+}        
+        </pre>
+        <p>The <code>pageFields</code> property is suitable for page level modules, such dashboards.<br>
+        The <code>options</code> property is managed by the module itself and can represent to any value a module could need.</p>
+        <pre>
+
+"dashboard": {
+  "roles": ["guest", "administrator", "editor"],
+  "pageFields": [
+    {
+      "type": "welcome",
+      "label": "Welcome to Vector.",
+      "options": {
+        "logged": "Select a collection to start editing",
+        "unlogged": "Please login to start editing",
+        "loggingIn": "Logging in.."
+      }
+    }
+  ]
+}
+        </pre>
+       
+        <h3 id="docSite">Integrating with your website</h3>
+        <p>Vector is designed to minimize the impact on existing websites. Currently, the only effective constraints are 
+        <ul>
+          <li>The automatic inclusion of Bootstrap 3</li>
+          <li>The use of ironrouter</li>
+          <li>Collection objects are already created and accessible with the <code>Vector.collections</code> array</li>
+        </ul>
+        <p>You can use this website, included whithin the repository, as a starting point to integate a website with vector. </p>
+        <h3 id="docUse">Using the admin panel</h3>
+        <p>The panel is available at <code>/admin</code></p>
+        <p>Vector crates a new user with username <code>super@user.com</code> and password <code>super</code></p>
+<<<<<<< HEAD
+        <p>The admin panel will display only the fields specified within the configuration; furthermore, a collection will be available to the user only if there is a matching role. Collections marked with <code>guest</code> will be readable to non logged users.</p>
+=======
+        <p>The admin panel will display only the fields specified whithin the configuration; furthermore, a collection will be available to the user only if there is a matching role. Collections marked with <code>guest</code> will be readable to non logged users.</p>
+>>>>>>> devel
+        <h3 id="docRoles">Managing users and roles</h3>
+        <p>Users are managed with the <code>accounts</code> collections. In order to manage users visibility and roles, you will need to include an <code>accounts</code> resource in the settings.json.</p>
+        <p>The <code>accounts</code> resource is managed exactly like the others, but listing and displaying user data will require specific modules. These modules are already available in the core package (see the module documentation).</p>
+        <p>Vector features a permission system based on roles. Roles are declared within the resource settings (see example above)</p>
+        <p>The role for the default user is <code>administrator</code></p>
+        <h3 id="docRel">Relationships between collections</h3>
+        <p>Vector has a simple, yet effective relationship system. Like other Vector features, relationships are very easy to implement.</p>
+        <p>The workflow is:</p>
+        <ul>
+          <li>Declaring relationship on the resource level</li>
+          <li>Use a document field to display and/or manage relationships</li>
+        </ul>
+        <p>Relationships are checked when the route has a document id, which is here defined as the current document.</p>
+        <p>The <code>children</code> property will automatically publish children documents. Children documents must have a reference to the current document. The reference is expressed as the collection name plus "_id".</p>
+        <p>This code will search for documents of the <code>articles</code> collection with a <code>pages_id</code> reference and publish it on the stream (Meteor will take care of merging other published documentsofthe same collection, if you have them).</p>
+        <pre>
+"pages": {
+  "roles": ["administrator"],
+  "children": ["articles"]
+        </pre>
+        <p>The <code>parents</code> property works in a similar way, this time taking an array of reference ids which is stored on the current document:</p>
+        <pre>
+"articles": {
+  "roles": ["administrator"],
+  "parents": ["pages"]
+        </pre>
+        <p>Vector currently offers a couple of modules to manage the relationships between documents: the <code>children</code> and <code>parents</code> document fields.</p>
+        <p><strong>Since these relationships aren't part of a formal model, you don't need to specify both parents and children. They are used only to publish documents when you need it.</strong></p>
+<<<<<<< HEAD
+        <p><strong>Relationships aren't yet implemented for the users collection.</strong></p>
+=======
+        <p><strong>Relatioships aren't yet full tested for the users collection, but should work fine.</strong></p>
+ <h3 id="docSettings">Settings</h3>
+        <p>The configuration file <code>settings.json</code> can be extended with specific Vector settings.</p>
+        <p>The <code>vectorSettings</code> object works on server if placed on the json root, and on client if placed inside the <code>public</code> object.</p>
+        <pre>
+{
+  "vectorSettings":{
+    "cloudinary":{
+      "key": "key",
+      "secret": "secret",
+      "cloud": "cloudName"
+    }
+  },
+  "public":{
+    "vectorSettings": {
+      "cloudinary":{
+        "cloud": "cloudName"
+      }
+    },
+    "vectorResources: {}
+  }
+}
+        </pre>
+        <p>List of current available public (client) settings and their default values.</p>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Key [type]</th>
+              <th>Setting</th>
+              <th>Default value</th>
+            </tr>            
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>adminRoot [string]</code></td>
+              <td>Root url for the admin panel</td>
+              <td><code>/admin</code></td>
+            </tr>
+            <tr>
+              <td><code>defaultDocumentTitleKey [string]</code></td>
+              <td>A key for the document title; used on core document list module</td>
+              <td><code>title</code></td>
+            </tr>
+            <tr>
+              <td><code>defaultDocumentTitle [string]</code></td>
+              <td>Title of new documents</td>
+              <td><code>title</code></td>
+            </tr>
+            <tr>
+              <td><code>defaultCollectionRoles [array]</code></td>
+              <td>Collection roles if no roles are specified</td>
+              <td><code>["administrator"]</code></td>
+            </tr>
+            <tr>
+              <td><code>defaultDeleteWarning [string]</code></td>
+              <td>Warning on document deletion</td>
+              <td><code>Click again to delete forever</code></td>
+            </tr>
+            <tr>
+              <td><code>defaultNoTemplateWarning [string]</code></td>
+              <td>Warning on template not found</td>
+              <td><code>Template not found</code></td>
+            </tr>
+            <tr>
+              <td><code>defaultLoginErrorWarning [string]</code></td>
+              <td>Login error message</td>
+              <td><code>Login error</code></td>
+            </tr>
+            <tr>
+              <td><code>defaultLoginSuccess [string]</code></td>
+              <td>Login success message</td>
+              <td><code>Welcome</code></td>
+            </tr>
+            <tr>
+              <td><code>sendVerificationEmail [bool]</code></td>
+              <td>Send email on user creation</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>documentsPerPage [int]</code></td>
+              <td>Documents per page</td>
+              <td><code>10</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <p>List of current available private (server) settings and their default values.</p>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Key [type]</th>
+              <th>Setting</th>
+              <th>Default value</th>
+            </tr>            
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>sendVerificationEmail [bool]</code></td>
+              <td>Send email on user creation</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>forbidClientAccountCreation [bool]</code></td>
+              <td>Prevent account creation from outside the admin panel</td>
+              <td><code>true</code></td>
+            </tr>
+          </tbody>
+        </table>
+>>>>>>> devel
+        <h3 id="docRoutes">Routes</h3>
+        <p>Vector manages admin routes for you and don't interfere with your main site routes.</p>
+        <p>The admin route is, by default <code>/admin</code>.<br>
+        You can change the default admin url inside <code>settings.json</code><br>
+        Collections are managed at <code>/admin/collectionName</code>, while documents are accessible at <code>/admin/collectionName/_id</code><br>
+        If you set up relationships, you can find related documents at <code>/admin/collectionName/_id/relatedCollectionName</code></p>
+<<<<<<< HEAD
+        <h3 id="docSite">Integrating with your website</h3>
+        <p>Vector is designed to minimize the impact on existing websites. Currently, the only effective constraints are
+        <ul>
+          <li>The automatic inclusion of the Bootstrap 3</li>
+          <li>The use of ironrouter</li>
+          <li>Collection objects are already created and accessible with the <code>Vector.collections</code> array</li>
+        </ul>
+        <p>You can use this website, included within the repository, as a starting point to integrate a website with vector. </p>
+=======
+>>>>>>> devel
+        <h3 id="docCustom">Building custom modules</h3>
+        <p>A module is a plain Meteor template. Each time a collection or a document is displayed, the system call the corresponding templates and assign them a data context.<br>
+        The context is available on both helpers and events methods and includes:</p>
+        <ul>
+          <li><code>data</code>: the document data or the collection cursor, depending on where the module is called</li>
+          <li><code>field</code>: contains the label, the field type and the key (if present)</li>
+          <li><code>collectionName</code>: to be used with <code>Vector.collections[collectionName]</code> to retrieve the current collection</li>
+        </ul>
+        <h3 id="docStandard">Conventions and default settings</h3>
+        <p>Vector follows the following conventions:</p>
+        <ul>
+          <li>
+            The resource name on <code>settings.json</code> determines the name of the collection; names are pluralized
+          </li>
+          <li>A collection is published under the name <code>vector_collectionName</code>.<br>Example: <code>pages</code> is published under <code>vector_pages</code>.<br>This allow developers to publish other streams with different names</li>
+<<<<<<< HEAD
+          <li>Relationships take the name <code>collectionName_id</code>. Example: a <code>pages</code> collections will have its documents referred with foreign keys <code>pages_id</code> inside documents of children collections</li>
+=======
+          <li>Relationships take the name <code>collectionName_id</code>. Example: a <code>pages</code> collections will have its documends referred with foreign keys <code>pages_id</code> inside documents of children collections</li>
+>>>>>>> devel
+          <li><code>settings.json</code> contain all the default settings</li>
+        </ul>
+        <h3 id="docForms">Modals API</h3>
+        <p>You can easily use modals inside your modules. Modals are plain Meteor templates, therefore they can have custom helpers and events.</p>
+        <p>Vector use the session <code>forms</code> to display or clear a modal. You can use the session in two ways:</p>
+        <ul>
+          <li>Simple: use <code>Session.set("forms",yourformname)</code> to display a form</li>
+          <li>Wih context: use <code>Session.set("forms",{type:yourformname,context:yourcontentobject})</code></li>
+          <li>To clear a modal: <code>Session.set("forms",null)</code></li>
+        </ul>
+        <p>The context property is useful to pass the field data to a modal, including the document key.</p>
+        <p>You can get the current global data context using <code>Router.getData</code>.</p>
+        <p>Since vector has some CSS classes for modals, we suggest to use the template below as a starting point.<br>The class <code>vectorFormCancel</code> will clear the session for you.</p>
+        <pre>
+&lt;template name=&quot;vectorFormPasswordChange&quot;&gt;
+  &lt;div class=&quot;row&quot;&gt;
+    &lt;form class=&quot;col-md-4 col-md-offset-4&quot;&gt;
+      &lt;div class=&quot;vectorFormBody&quot;&gt;
+        &lt;label&gt;Old password&lt;/label&gt;
+        &lt;input type=&quot;password&quot; id=&quot;vectorFormPasswordChange_old&quot;&gt; 
+        &lt;label&gt;New password&lt;/label&gt;
+        &lt;input type=&quot;password&quot; id=&quot;vectorFormPasswordChange_new&quot;&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;vectorFormActions text-right&quot;&gt;
+        &lt;button class=&quot;btn btn-warning vectorFormCancel&quot;&gt;Cancel&lt;/button&gt;
+        &lt;button class=&quot;btn btn-primary&quot; type=&quot;submit&quot;&gt;Confirm&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/template&gt;        </pre>     
+        <h3 id="docHooks">Helpers and hooks cheatsheet</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Hook</th>
+              <th>Where</th>
+              <th>Notes</th>
+            </tr>            
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>this</code></td>
+              <td>Javascript templates</td>
+              <td>Contains the context of the template<br></td>
+            </tr>
+            <tr>
+              <td><code>Vector.collections</code></td>
+              <td>Javascript</td>
+              <td>Array of declared collections</td>
+            </tr>            
+            <tr>
+              <td><code>Vector.settings</code></td>
+              <td>Javascript(client)</td>
+              <td>Usable inside templates.<br>General settings on vector/settings.coffee</td>
+            </tr>         
+            <tr>
+              <td><code>Vector.privateSettings</code></td>
+              <td>Javascript(server)</td>
+              <td>Usable inside templates.<br>Server only settings on vector/settings_server.coffee</td>
+            </tr>         
+            <tr>
+              <td><code>Router.getData</code></td>
+              <td>Javascript</td>
+              <td>Usable inside templates.<br>Contains useful data expressed within ironrouter controllers</td>
+            </tr>    
+            <tr>
+              <td><code>navigation</code></td>
+              <td>HTML</td>
+              <td>Handlebars helper. Returns an array of objects, one for each page of the current collection.<br>The object contains the page number (<code>index</code>) and an <code>active</code> property, true is <code>index</code> is equal to the current page.</td>
+            </tr>     
+            <tr>
+              <td><code>plainValue</code></td>
+              <td>HTML</td>
+              <td>Handlebars helper.<br>Renders the plain value of a property; useful inside document fields</td>
+            </tr>         
+            <tr>
+              <td><code>activeDocumentIs</code></td>
+              <td>HTML</td>
+              <td>Handlebars helper.<br>Requires an _id parameter; return true or false</td>
+            </tr>         
+            <tr>
+              <td><code>activeCollectionIs</code></td>
+              <td>HTML</td>
+              <td>Handlebars helper.<br>Requires an _id parameter; return true or false</td>
+            </tr>         
+            <tr>
+              <td><code>settings</code></td>
+              <td>HTML</td>
+              <td>Handlebars helper.<br>General settings on vector/settings.coffee</td>
+            </tr>         
+            <tr>
+              <td><code>.vectorFormCancel</code></td>
+              <td>HTML modals</td>
+              <td>A button with this class will close the modal and clear the <code>forms</code> session for you</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2 id="modules">Modules documentation</h2>
+        <p>Vector provide core modules for the everyday admin panel: textareas, collection lists, galleries, relationships, account management. More modules will come in the future; we are working at permalinks, rich text editors and taxonomies.</p>
+        <p>Custom modules are asy to develop: they are plain Meteor templates.</p>
+        <h3>Document level</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Type</th>
+              <th>Notes</th>
+            </tr>            
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>text</code></td>
+              <td>Document field</td>
+              <td>Text input</td>
+            </tr>            
+            <tr>
+              <td><code>textarea</code></td>
+              <td>Document field</td>
+              <td>Textarea</td>
+            </tr>         
+            <tr>
+              <td><code>gallery</code></td>
+              <td>Document field</td>
+              <td>Displays a simple image list and an upload input.<br><strong>This module is integrated with Cloudinary; the files settings.json must contain your credentials. See <a href="#docSettings">settings</a> for an example.</strong></td>
+            </tr>
+            <tr>
+              <td><code>accountEmails</code></td>
+              <td>Document field</td>
+              <td>Displays the first email of a Meteor account</td>
+            </tr>
+            <tr>
+              <td><code>accountPassword</code></td>
+              <td>Document field</td>
+              <td>Allows to update the password through a modal</td>
+            </tr>
+            <tr>
+              <td><code>children</code></td>
+              <td>Document field</td>
+              <td>Displays a list of children documents with links. To use with the <code>children</code> resource property</td>
+            </tr>
+            <tr>
+              <td><code>parents</code></td>
+              <td>Document field</td>
+              <td>Displays a list of parent documents with links. To use with the <code>parents</code> resource property</td>
+            </tr>
+            <tr>
+              <td><code>duplicate</code></td>
+              <td>Document action</td>
+              <td>Duplicates the current document according to the resource definition</strong></td>
+            </tr>   
+            <tr>
+              <td><code>delete</code></td>
+              <td>Document action</td>
+              <td>Removes the document from the database</strong></td>
+            </tr>               
+          </tbody>
+        </table>
+        <h3>Collection level</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Type</th>
+              <th>Notes</th>
+            </tr>            
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>list</code></td>
+              <td>Collection body</td>
+              <td>List the collection documents</td>
+            </tr>            
+            <tr>
+              <td><code>accountList</code></td>
+              <td>Collection body</td>
+              <td>List the collection documents; to use with the Meteor.users collection</td>
+            </tr>         
+            <tr>
+              <td><code>create</code></td>
+              <td>Collection action</td>
+              <td>Creates a new document</td>
+            </tr>
+            <tr>
+              <td><code>pagination</code></td>
+              <td>Collection action</td>
+              <td>Displays a list of buttons, one for each page. <br>Visible only if more that one page is selectable.</td>
+            </tr>
+            <tr>
+              <td><code>accountCreate</code></td>
+              <td>Collection action</td>
+              <td>Prompt a modal to create a new user<br>Optional: if an array of roles is specified as the <code>options</code> property of the field, a select box will appear</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Page level</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Type</th>
+              <th>Notes</th>
+            </tr>            
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>dashboard</code></td>
+              <td>Entire page</td>
+              <td>Display a welcome message if logged, or a login form if unlogged. Requires <code>guest</code> role to work with unlogged users</td>
+            </tr>            
+          </tbody>
+        </table>
+        <h3>Modal level</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Used in</th>
+              <th>Notes</th>
+            </tr>            
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>vectorFormPasswordChange</code></td>
+              <td>accountPassword</td>
+              <td>Called by the <code>accountPassword</code> document field</td>
+            </tr>
+            <tr>
+              <td><code>vectorFormAccountCreate</code></td>
+              <td>accountList</td>
+              <td>Called by <code>accountCreate</code> collection action</td>
+            </tr> 
+            <tr>
+              <td><code>vectorFormChildren</code></td>
+              <td>children</td>
+              <td>Manage and view children (has_many) documents</td>
+            </tr>
+            <tr>
+              <td><code>vectorFormParents</code></td>
+              <td>parents</td>
+              <td>Manage and view parents (belongs_to_many) documents</td>
+            </tr>
+          </tbody>
+        </table>
+        <h2 id="demo">Demo</h2>
+        <p>Use email: <code>editor@editor.com</code>, password: <code>editor</code></p>
+        <p>Demo url: <a href="/admin">/admin</a></p>
+        <p>This panel is the main web site panel, but demo users can only access a demo collection.</p>
+        <h2 id="contribute">Contributing</h2>
+        <p>Vector is an open project released under MIT licence. It is free for both personal and commercial use.<br>
+        Contribution is the best way to show appreciation for the project ;)<br>
+        The main repository can be found at <a href="https://github.com/handmadeadv/vector">https://github.com/handmadeadv/vector</a></p>
+        <h3>What is needed</h3>
+        <ul>
+          <li>Spell checking</li>
+          <li>Additional modules</li>
+          <li>Idaes for a better core design</li>
+          <li>Tests</li>
+          <li>Security checks</li>
+        </ul>
+        <h3>Contributing with modules</h3>
+        <p>Modules are plain Meteor templates; they can be created and distributed as independent packages.</p>
+        <p>We propose the syntax <code>vector-packagename</code> to standardize the package naming.</p>
+        <p>Of course, you can also improve existing modules or propose additions to the core.</p>
+        <h3>Contributing to the core</h3>
+        <p>The core of Vector is really thin. Here is how is works under the hood:</p>
+        <ul>
+          <li>Ironrouter is responsible for reading the route parameters and filling the global context with data</li>
+          <li>The context is typically made of collection cursors, document data and fields data</li>
+          <li>The main template has three main loops: page, collection and document</li>
+          <li>Each of these loops accept an array of fields (modules) which are Meteor templates</li>
+          <li>Each fields receive the right context; i.e. a cursor for a collection field and a document for a document field</li>
+          <li>The looping and the context assignation is made by Handlebars helpers</li>
+          <li>Additional sessions can be used to store volatile UI operations, such modals</li>
+        </ul>
+        <h3></h3>
+      </div>
+    </div>
+  </div>
+</template>
