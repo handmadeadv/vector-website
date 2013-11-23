@@ -65,14 +65,18 @@
           <li>The package includes Bootstrap 3 into your html</li>
         </ul>
         <h3 id="docInstallation">Installation</h3>
-        <p>This package is not currently available through Meteorite. To use it:
-        <ul>
-          <li>Clone the repository at <code>https://github.com/handmadeadv/vector.git</code></li>
-          <li>Or download the repo as a zip archive at <a href="https://github.com/handmadeadv/vector">https://github.com/handmadeadv/vector</a></li>
-          <li>Enter your project and run <code>mrt --settings settings.json</code>; this will update the dependencies and run the server</li>
-          <li>The default credentials are email:<code>super@user.com</code>, password:<code>super</code></li>
-          <li>Optional: you can check this webiste as a live example of integration at <a href="https://github.com/handmadeadv/vector-website">https://github.com/handmadeadv/vector-website</a></li>
-        </ul>
+        <pre>
+mrt add bootstrap-3
+mrt add iron-router
+mrt add vector
+meteor remove autopublish
+meteor remove insecure
+meteor --settings settings.json (use the file inside /examples)
+go to /admin
+user: super@user.com, password: super       
+use iron-router layouts for your main content   
+        </pre>
+        <p>Optional: you can check this webiste as a live example of integration at <a href="https://github.com/handmadeadv/vector-website">https://github.com/handmadeadv/vector-website</a></p>
         <p><strong><br>Since this entire website is included into the repository, you can use the repo as a living example of integration within a project.</strong></p>
         <h3 id="docConfig">Basic configuration</h3>
         <p>Your main configuration file will be <code>settings.json</code> inside the <code>vectorResources</code> object.<br>Here you will setup which collections and which fields will be available to the end user.
