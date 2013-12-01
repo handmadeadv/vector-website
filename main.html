@@ -441,6 +441,7 @@ user: super@user.com, password: super
         You can change the default admin url inside <code>settings.json</code><br>
         Collections are managed at <code>/admin/collectionName</code>, while documents are accessible at <code>/admin/collectionName/_id</code><br>
         If you set up relationships, you can find related documents at <code>/admin/collectionName/_id/relatedCollectionName</code></p>
+        <p>As per frontend routes, the developer is free to set them as needed.<br>Vector currently offers a module to easily create permainks from document titles: <code>titleWithPermalink</code></p>
         <h3 id="docCustom">Building custom modules</h3>
         <p>A module is a plain Meteor template. Each time a collection or a document is displayed, the system call the corresponding templates and assign them a data context.<br>
         The context is available on both helpers and events methods and includes:</p>
@@ -580,7 +581,13 @@ user: super@user.com, password: super
               <td><code>text</code></td>
               <td>Document field</td>
               <td>Text input</td>
-            </tr>            
+            </tr>          
+            <tr>
+              <td><code>titleWithPermalink</code></td>
+              <td>Document field</td>
+              <td>A text imput with a permalink creation system.<br>The text content is stored on the choosen key, while a <code>permalink</code> document property is generated/updated reactively when the title is updated.
+              </td>
+            </tr>  
             <tr>
               <td><code>textarea</code></td>
               <td>Document field</td>
