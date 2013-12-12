@@ -59,6 +59,10 @@
           <li><a href="#docForms">Modals API</a></li>
           <li><a href="#docHooks">Helpers and hooks cheatsheet</a></li>
         </ul>
+        <h4>Troubleshooting</h4>
+        <ul>
+          <li><a href="#troubleColDef">Getting 'collection already defined' errors</a></li>
+        </ul>
         <h3 id="docDeps">Dependencies</h3>
         <ul>
           <li>Iron router, coffeescript and stylus packages are required by the package itself</li>
@@ -747,7 +751,14 @@ user: super@user.com, password: super
           <li>The looping and the context assignation is made by Handlebars helpers</li>
           <li>Additional sessions can be used to store volatile UI operations, such modals</li>
         </ul>
-        <h3></h3>
+        <h2>Troubleshooting</h2>
+        <h3 id="troubleColDef">Getting 'collection already defined' errors</h3>
+        <p>Vector define the collections specified inside settings.json at package level. You don't need to define them yourself - just use the <code>Vector.collections</code> array to retrieve the collection object you need.</p>
+        <p>If you have a <code>pages</code> collection, you will access the collection object with <code>Vector.collections["pages"]</code> or <code>Vector.collection.pages</code> and use it as you would use normal variables: 
+        <pre>
+var myDocs = Vector.collections.pages;
+var count = myDocs.find().count();
+myDocs.insert({name:"Bill",surname:"Smith"});</pre>
       </div>
     </div>
   </div>
